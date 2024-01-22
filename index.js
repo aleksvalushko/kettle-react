@@ -1,5 +1,7 @@
 const INCREASE = 'increase';
 const DECREASE = 'decrease';
+const KETTLE_ON = 'kettleOn';
+const KETTLE_OFF = 'kettleOff';
 const WATER_AMOUNT_STEP = 0.1; // шаг добавления(удаления) воды в(из) чайника
 
 class KettleComponent extends React.Component {
@@ -21,15 +23,11 @@ class KettleComponent extends React.Component {
 	}
 
 	set waterAmount(value) { // сеттер для изменения количества воды в чайнике в зависимости от того, какая кнопка была нажата (добавить воды/отлить воды)
-		if (value === INCREASE) {
-			this.setState({ waterAmount: +(this.state.waterAmount + WATER_AMOUNT_STEP).toFixed(1) });
-			return;
+		const mapValueToWaterAmount = {
+			[INCREASE]: +(this.state.waterAmount + WATER_AMOUNT_STEP).toFixed(1),
+			[DECREASE]: +(this.state.waterAmount - WATER_AMOUNT_STEP).toFixed(1)
 		}
-		if (value === DECREASE) {
-			this.setState({ waterAmount: +(this.state.waterAmount - WATER_AMOUNT_STEP).toFixed(1) });
-			return;
-		}
-		this.setState({ waterAmount: 0 });
+		this.setState({ waterAmount: mapValueToWaterAmount[value] || 0 });
 	}
 
 	get timer() { // геттер переменной для вызова clearInterval
@@ -41,6 +39,7 @@ class KettleComponent extends React.Component {
 	}
 
 	disableButtons = (value) => { // метод для блокировок кнопок (добавить воды/отлить воды) в зависимости от условий (при достижении максимального и минимального значений)
+		if (this.state.isKettleOn) return true;
 		if (value === INCREASE) return this.waterAmount === 1;
 		if (value === DECREASE) return !this.waterAmount;
 		return false;
@@ -74,34 +73,22 @@ class KettleComponent extends React.Component {
 	}
 
 	showKettleCondition = () => { // метод для установки состояния чайника в зависимости от определенных условий
-		switch (true) {
-			case this.state.isKettleOn: {
-				return 'включен';
-			}
-			case !this.state.isKettleOn && this.state.isWaterBoiled: {
-				return 'закипел';
-			}
-			case !this.state.isKettleOn && !this.state.isWaterBoiled: {
-				return 'выключен';
-			}
-			default: {
-				return '';
-			}
-		}
+		if (this.state.isKettleOn) return 'включен';
+		return this.state.isWaterBoiled ? 'закипел' : 'выключен';
 	}
 
 	render() {
 		return (
 			<div className='context'>
-				{ !this.state.isWaterBoiled ? <img src="./images/kettleWithoutSteam.svg" alt="kettleWithoutSteam"/> :
-					<img src="./images/kettleWithSteam.svg" alt="kettleWithSteam"/> }
-				<span>Количество налитой воды: { !this.waterAmount ? 0 : this.waterAmount.toFixed(1) } л</span>
+				{ this.state.isWaterBoiled ? <img src="./images/kettleWithSteam.svg" alt="kettleWithSteam"/> :
+					<img src="./images/kettleWithoutSteam.svg" alt="kettleWithoutSteam"/> }
+				<span>Количество налитой воды: { this.waterAmount ? this.waterAmount.toFixed(1) : 0 } л</span>
 				<div className='buttons'>
-					<button className='button' disabled={ this.disableButtons(INCREASE) || this.state.isKettleOn }
+					<button className='button' disabled={ this.disableButtons(INCREASE) }
 					        onClick={ () => this.waterAmount = INCREASE }>
 						Долить воды
 					</button>
-					<button className='button' disabled={ this.disableButtons(DECREASE) || this.state.isKettleOn }
+					<button className='button' disabled={ this.disableButtons(DECREASE) }
 					        onClick={ () => this.waterAmount = DECREASE }>
 						Отлить воды
 					</button>
