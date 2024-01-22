@@ -18,11 +18,7 @@ class KettleComponent extends React.Component {
 		};
 	}
 
-	get waterAmount() { // геттер для количества воды в чайнике
-		return this.state.waterAmount;
-	}
-
-	set waterAmount(value) { // сеттер для изменения количества воды в чайнике в зависимости от того, какая кнопка была нажата (добавить воды/отлить воды)
+	setWaterAmount = (value) => { // функция для изменения количества воды в чайнике в зависимости от того, какая кнопка была нажата (добавить воды/отлить воды)
 		const mapValueToWaterAmount = {
 			[INCREASE]: +(this.state.waterAmount + WATER_AMOUNT_STEP).toFixed(1),
 			[DECREASE]: +(this.state.waterAmount - WATER_AMOUNT_STEP).toFixed(1)
@@ -30,25 +26,17 @@ class KettleComponent extends React.Component {
 		this.setState({ waterAmount: mapValueToWaterAmount[value] || 0 });
 	}
 
-	get timer() { // геттер переменной для вызова clearInterval
-		return this.state.timer;
-	}
-
-	set timer(value) { // сеттер переменной для возможности дальнейшего вызова clearInterval
-		this.setState({ timer: value });
-	}
-
 	disableButtons = (value) => { // метод для блокировок кнопок (добавить воды/отлить воды) в зависимости от условий (при достижении максимального и минимального значений)
 		if (this.state.isKettleOn) return true;
-		if (value === INCREASE) return this.waterAmount === 1;
-		if (value === DECREASE) return !this.waterAmount;
+		if (value === INCREASE) return this.state.waterAmount === 1;
+		if (value === DECREASE) return !this.state.waterAmount;
 		return false;
 	}
 
 	kettleOn = () => { // метод включения чайника
 		this.showNotification(); // выводим сообщение о состоянии чайника
 		this.setState({ isWaterBoiled: false, isKettleOn: true });
-		const temperatureForOneSecond = 100 / (this.waterAmount * 10);  // рассчитываем время кипения воды для текущего объема залитой в чайник воды
+		const temperatureForOneSecond = 100 / (this.state.waterAmount * 10);  // рассчитываем время кипения воды для текущего объема залитой в чайник воды
 		this.timer = setInterval(() => {  // изменяем сообщение о текущей температуры воды в чайнике каждую секунду
 			this.setState({
 				isShowCurrentTemperatureNotification: true,
@@ -82,20 +70,20 @@ class KettleComponent extends React.Component {
 			<div className='context'>
 				{ this.state.isWaterBoiled ? <img src="../images/kettleWithSteam.svg" alt="kettleWithSteam"/> :
 					<img src="../images/kettleWithoutSteam.svg" alt="kettleWithoutSteam"/> }
-				<span>Количество налитой воды: { this.waterAmount ? this.waterAmount.toFixed(1) : 0 } л</span>
+				<span>Количество налитой воды: { this.state.waterAmount ? this.state.waterAmount.toFixed(1) : 0 } л</span>
 				<div className='buttons'>
 					<button className='button' disabled={ this.disableButtons(INCREASE) }
-					        onClick={ () => this.waterAmount = INCREASE }>
+					        onClick={ () => this.setWaterAmount(INCREASE) }>
 						Долить воды
 					</button>
 					<button className='button' disabled={ this.disableButtons(DECREASE) }
-					        onClick={ () => this.waterAmount = DECREASE }>
+					        onClick={ () => this.setWaterAmount(DECREASE) }>
 						Отлить воды
 					</button>
-					<button className='button' disabled={ !this.waterAmount || this.state.isKettleOn } onClick={ this.kettleOn }>
+					<button className='button' disabled={ !this.state.waterAmount || this.state.isKettleOn } onClick={ this.kettleOn }>
 						Включить чайник
 					</button>
-					<button className='button' disabled={ !this.waterAmount || !this.state.isKettleOn }
+					<button className='button' disabled={ !this.state.waterAmount || !this.state.isKettleOn }
 					        onClick={ this.kettleOff }>
 						Выключить чайник
 					</button>
