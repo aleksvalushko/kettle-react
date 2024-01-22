@@ -1,7 +1,5 @@
 const INCREASE = 'increase';
 const DECREASE = 'decrease';
-const KETTLE_ON = 'kettleOn';
-const KETTLE_OFF = 'kettleOff';
 const WATER_AMOUNT_STEP = 0.1; // шаг добавления(удаления) воды в(из) чайника
 
 class KettleComponent extends React.Component {
