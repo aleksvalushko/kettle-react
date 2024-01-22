@@ -1,11 +1,11 @@
 const INCREASE = 'increase';
 const DECREASE = 'decrease';
+const WATER_AMOUNT_STEP = 0.1; // шаг добавления(удаления) воды в(из) чайника
 
 class KettleComponent extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			waterAmountStep: 0.1, // шаг добавления(удаления) воды в(из) чайника
 			waterAmount: 0, // количество воды в чайнике
 			isKettleOn: false, // состояние чайника (включен/выключен)
 			temperature: 0, // текущая температура воды в чайнике (изначально берем температуру равную 0)
@@ -21,20 +21,15 @@ class KettleComponent extends React.Component {
 	}
 
 	set waterAmount(value) { // сеттер для изменения количества воды в чайнике в зависимости от того, какая кнопка была нажата (добавить воды/отлить воды)
-		switch (value) {
-			case INCREASE: {
-				this.setState({ waterAmount: +(this.state.waterAmount + this.state.waterAmountStep).toFixed(1) });
-				break;
-			}
-			case DECREASE: {
-				this.setState({ waterAmount: +(this.state.waterAmount - this.state.waterAmountStep).toFixed(1) });
-				break;
-			}
-			default: {
-				this.setState({ waterAmount: 0 });
-				break;
-			}
+		if (value === INCREASE) {
+			this.setState({ waterAmount: +(this.state.waterAmount + WATER_AMOUNT_STEP).toFixed(1) });
+			return;
 		}
+		if (value === DECREASE) {
+			this.setState({ waterAmount: +(this.state.waterAmount - WATER_AMOUNT_STEP).toFixed(1) });
+			return;
+		}
+		this.setState({ waterAmount: 0 });
 	}
 
 	get timer() { // геттер переменной для вызова clearInterval
@@ -46,17 +41,9 @@ class KettleComponent extends React.Component {
 	}
 
 	disableButtons = (value) => { // метод для блокировок кнопок (добавить воды/отлить воды) в зависимости от условий (при достижении максимального и минимального значений)
-		switch (value) {
-			case INCREASE: {
-				return this.waterAmount === 1;
-			}
-			case DECREASE: {
-				return !this.waterAmount;
-			}
-			default: {
-				return false;
-			}
-		}
+		if (value === INCREASE) return this.waterAmount === 1;
+		if (value === DECREASE) return !this.waterAmount;
+		return false;
 	}
 
 	kettleOn = () => { // метод включения чайника
