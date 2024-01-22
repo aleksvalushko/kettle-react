@@ -80,8 +80,8 @@ class KettleComponent extends React.Component {
 	render() {
 		return (
 			<div className='context'>
-				{ this.state.isWaterBoiled ? <img src="./images/kettleWithSteam.svg" alt="kettleWithSteam"/> :
-					<img src="./images/kettleWithoutSteam.svg" alt="kettleWithoutSteam"/> }
+				{ this.state.isWaterBoiled ? <img src="../images/kettleWithSteam.svg" alt="kettleWithSteam"/> :
+					<img src="../images/kettleWithoutSteam.svg" alt="kettleWithoutSteam"/> }
 				<span>Количество налитой воды: { this.waterAmount ? this.waterAmount.toFixed(1) : 0 } л</span>
 				<div className='buttons'>
 					<button className='button' disabled={ this.disableButtons(INCREASE) }
